@@ -99,4 +99,6 @@ async def recognize_face(file: UploadFile = File(...)):
     else:
         return {"message": "No matching identity found"}
         
-    
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  # <-- read PORT from env
+    uvicorn.run(app, host="0.0.0.0", port=port)
