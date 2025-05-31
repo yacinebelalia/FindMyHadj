@@ -263,7 +263,7 @@ async def recognize_face(file: UploadFile = File(...)):
                 continue
         
         # Set threshold for matching
-        threshold = 0.5
+        threshold = 0.4
         
         if max_similarity > threshold and best_match is not None:
             logger.info(f"Found match with similarity {max_similarity} for record {best_match.get('id')}")
