@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  find-hadji:  
+  find-hadji:
     container_name: find-hadji
     build:
       context: .
@@ -7,8 +9,39 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/App
-    command: uvicorn App.api:app --host 0.0.0.0 --port 8000 --reload
+      - ./App:/app/App:ro
+      - ./logs:/app/logs
+    command: uvicorn App.face_api:app --host 0.0.0.0 --port 8000 --reload --log-level info
     environment:
       - PYTHONUNBUFFERED=1
-     # If you have environment variables in a .env file, it will be loaded automatically
+      - PYTHONDONTWRITEBYTECODE=1
+      - LOG_LEVEL=INFO
+      - PYTHONPATH=/app
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hadj-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+networks:
+  hadj-network:
+    driver: bridge
